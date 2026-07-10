@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1c1a16">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Spindle — Now Playing</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="ambient-layer" id="ambientA"></div>
+<div class="ambient-layer" id="ambientB"></div>
+<div class="ambient-scrim"></div>
+
+<div class="stage">
+  <div class="deck">
+    <span class="screw tl"></span><span class="screw tr"></span>
+    <span class="screw bl"></span><span class="screw br"></span>
+
+    <div class="deck-header">
+      <div class="brand-plate">
+        <span class="power-led" id="powerLed"></span>
+        SPINDLE · SP-01
+      </div>
+      <div class="format-tabs">
+        <button class="format-tab active" data-format="vinyl">VINYL</button>
+        <button class="format-tab" data-format="cd">CD</button>
+        <button class="format-tab" data-format="cassette">TAPE</button>
+      </div>
+    </div>
+
+    <div class="media-window" id="mediaWindow">
+
+      <div class="media-format active" data-format="vinyl">
+        <div class="vinyl-disc-wrap" id="vinylWrap">
+          <div class="vinyl-disc">
+            <div class="vinyl-label" id="vinylLabel"></div>
+          </div>
+          <div class="tonearm" id="tonearm">
+            <div class="tonearm-pivot"></div>
+            <div class="tonearm-rod"></div>
+            <div class="tonearm-head"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="media-format" data-format="cd">
+        <div class="cd-disc-wrap" id="cdWrap">
+          <div class="cd-disc" id="cdDisc">
+            <div class="cd-hub"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="media-format" data-format="cassette">
+        <div class="cassette-body" id="cassetteBody">
+          <div class="cassette-label">
+            <span class="ct-title" id="cassetteTitle">Not connected</span>
+            <span class="ct-sub" id="cassetteSub">SIDE A</span>
+          </div>
+          <div class="cassette-reels">
+            <div class="reel-window">
+              <div class="reel" id="reelLeft">
+                <div class="reel-tape" id="reelLeftTape"></div>
+                <div class="reel-hub"></div>
+              </div>
+            </div>
+            <div class="reel-window">
+              <div class="reel" id="reelRight">
+                <div class="reel-tape" id="reelRightTape"></div>
+                <div class="reel-hub"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="connect-overlay" id="connectOverlay">
+        <div class="connect-title">Connect your Spotify</div>
+        <div class="connect-sub">Link your account to see what's currently playing, right here on the deck.</div>
+        <button class="btn-spotify" id="connectBtn">Connect Spotify</button>
+        <button class="link-btn" id="openSettingsFromConnect">Advanced setup</button>
+      </div>
+
+      <div class="settings-panel hidden" id="settingsPanel">
+        <button class="close-x" id="closeSettings">&times;</button>
+        <h3>Setup</h3>
+        <div class="settings-hint">Paste the Client ID from your Spotify Developer Dashboard app, and the exact Redirect URI you registered there (must match this page's URL exactly).</div>
+        <label>Client ID</label>
+        <input type="text" id="clientIdInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <label>Redirect URI</label>
+        <input type="text" id="redirectUriInput" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <button class="save-btn" id="saveSettings">Save</button>
+        <button class="link-btn" id="disconnectBtn" style="margin-top:14px;">Disconnect Spotify account</button>
+      </div>
+
+      <button class="corner-btn gear-btn" id="gearBtn" title="Setup">
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94a7.14,7.14,0,0,0,.06-.94,7.14,7.14,0,0,0-.06-.94l2.03-1.58a.5.5,0,0,0,.12-.64l-1.92-3.32a.5.5,0,0,0-.6-.22l-2.39.96a7.3,7.3,0,0,0-1.63-.94L14.4,2.81A.5.5,0,0,0,13.9,2.4h-3.8a.5.5,0,0,0-.5.41l-.36,2.55a7.3,7.3,0,0,0-1.63.94l-2.39-.96a.5.5,0,0,0-.6.22L2.7,8.88a.5.5,0,0,0,.12.64L4.85,11.1a7.14,7.14,0,0,0-.06.94,7.14,7.14,0,0,0,.06.94L2.82,14.56a.5.5,0,0,0-.12.64l1.92,3.32a.5.5,0,0,0,.6.22l2.39-.96a7.3,7.3,0,0,0,1.63.94l.36,2.55a.5.5,0,0,0,.5.41h3.8a.5.5,0,0,0,.5-.41l.36-2.55a7.3,7.3,0,0,0,1.63-.94l2.39.96a.5.5,0,0,0,.6-.22l1.92-3.32a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+      </button>
+
+      <button class="corner-btn queue-btn" id="queueBtn" title="Queue">
+        <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="2" rx="1"/><rect x="4" y="11" width="16" height="2" rx="1"/><rect x="4" y="17" width="10" height="2" rx="1"/><circle cx="19" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M19,15.6V18" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
+      </button>
+
+      <div class="queue-panel" id="queuePanel">
+        <div class="queue-header">
+          <h3>Queue</h3>
+          <button class="close-x" id="closeQueue">&times;</button>
+        </div>
+        <div class="queue-search-row">
+          <input type="text" id="queueSearchInput" placeholder="Search a track to add…" autocomplete="off" autocapitalize="off" spellcheck="false">
+        </div>
+        <div class="queue-scroll">
+          <div class="queue-search-results" id="queueSearchResults"></div>
+          <div class="queue-divider" id="queueDivider">Next up</div>
+          <div class="queue-list" id="queueList"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="info-strip">
+      <div class="track-title-mask"><span class="track-title" id="trackTitle">Not connected</span></div>
+      <div class="track-artist" id="trackArtist">Tap connect to link Spotify</div>
+      <div class="progress-row">
+        <span id="elapsedTime">0:00</span>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <span id="durationTime">0:00</span>
+      </div>
+      <div class="transport-row">
+        <button class="transport-btn" id="prevBtn">
+          <svg viewBox="0 0 24 24"><path d="M6,6h2v12H6ZM9.5,12,19,6V18Z"/></svg>
+        </button>
+        <button class="transport-btn play" id="playBtn">
+          <svg viewBox="0 0 24 24" id="playIcon"><path d="M8,5v14l11-7Z"/></svg>
+        </button>
+        <button class="transport-btn" id="nextBtn">
+          <svg viewBox="0 0 24 24"><path d="M16,6h2v12H16ZM5,6l9.5,6L5,18Z"/></svg>
+        </button>
+      </div>
+      <div class="status-line" id="statusLine">Not connected</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<canvas id="colorCanvas" width="24" height="24" style="display:none;"></canvas>
+
+<script src="app.js"></script>
+</body>
+</html>
