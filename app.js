@@ -5,10 +5,14 @@
   'use strict';
 
   const SCOPES = 'user-read-currently-playing user-read-playback-state user-modify-playback-state';
+  // FIXED: Actual Spotify Endpoints
   const TOKEN_ENDPOINT = 'https://accounts.spotify.com/api/token';
   const AUTH_ENDPOINT = 'https://accounts.spotify.com/authorize';
   const API_BASE = 'https://api.spotify.com/v1';
+  
   const POLL_MS = 4000;
+  const MAX_POLL_MS = 60000;
+  let currentPollMs = POLL_MS;
 
   // ---------- element refs ----------
   const el = (id) => document.getElementById(id);
@@ -229,13 +233,31 @@
       showConnectOverlay();
       return;
     }
+
+    // FIXED: Rate limiting logic
+    if (resp.status === 429) {
+      const retryAfter = resp.headers.get('Retry-After');
+      if (retryAfter) {
+        currentPollMs = parseInt(retryAfter, 10) * 1000;
+      } else {
+        currentPollMs = Math.min(currentPollMs * 2, MAX_POLL_MS);
+      }
+      return;
+    }
+
+    if (resp.ok || resp.status === 204) {
+      currentPollMs = POLL_MS; // reset on success
+    }
+
     if (resp.status === 204) { showIdle(); return; }
     if (resp.status === 401) {
       const refreshed = await refreshAccessToken();
       if (!refreshed) { disconnect(); }
       return;
     }
+    
     if (!resp.ok) return; // transient — try again next tick
+    
     let data;
     try { data = await resp.json(); } catch (e) { return; }
     if (!data || !data.item) { showIdle(); return; }
@@ -266,7 +288,6 @@
     const container = span.parentElement;
     span.classList.remove('scrolling');
     span.style.removeProperty('--marquee-distance');
-    // measure on next frame so layout has settled
     requestAnimationFrame(() => {
       const overflow = span.scrollWidth - container.clientWidth;
       if (overflow > 4) {
@@ -336,7 +357,7 @@
       lastTrackId = trackId;
       if (!isFirstLoad) {
         cassetteBody.classList.remove('tape-change');
-        void cassetteBody.offsetWidth; // restart the animation even if it's still mid-run
+        void cassetteBody.offsetWidth; 
         cassetteBody.classList.add('tape-change');
         setTimeout(() => cassetteBody.classList.remove('tape-change'), 950);
       }
@@ -396,15 +417,27 @@
     lastTrackId = null;
   }
 
-  // ---------- polling ----------
+  // ---------- polling (FIXED: Recursive setTimeout with Backoff) ----------
   let pollTimer = null;
-  function startPolling() {
-    fetchNowPlaying();
-    clearInterval(pollTimer);
-    pollTimer = setInterval(fetchNowPlaying, POLL_MS);
+  
+  function scheduleNextPoll(delay) {
+    clearTimeout(pollTimer);
+    pollTimer = setTimeout(() => {
+      fetchNowPlaying().finally(() => {
+        if (pollTimer) scheduleNextPoll(currentPollMs);
+      });
+    }, delay);
   }
+
+  function startPolling() {
+    currentPollMs = POLL_MS;
+    fetchNowPlaying().finally(() => {
+      scheduleNextPoll(currentPollMs);
+    });
+  }
+  
   function stopPolling() {
-    clearInterval(pollTimer);
+    clearTimeout(pollTimer);
     pollTimer = null;
   }
 
@@ -529,85 +562,13 @@
         return;
       }
       items.forEach((t) => queueSearchResultsEl.appendChild(makeTrackRow(t, true)));
-    } catch (e) { /* ignore transient search errors */ }
+    } catch (e) { }
   }
+  
   queueSearchInput.addEventListener('input', () => {
     clearTimeout(searchDebounceTimer);
     const q = queueSearchInput.value.trim();
     searchDebounceTimer = setTimeout(() => searchTracks(q), 400);
   });
 
-  async function addToQueue(uri, btnEl) {
-    btnEl.disabled = true;
-    try {
-      const resp = await spotifyFetch(`/me/player/queue?uri=${encodeURIComponent(uri)}`, 'POST');
-      if (resp.status === 404) { toast('Open Spotify on a device first'); }
-      else if (resp.status === 403) { toast('Adding to queue needs Spotify Premium'); }
-      else if (resp.ok) { toast('Added to queue'); setTimeout(loadQueue, 400); }
-      else { toast('Could not add that track'); }
-    } catch (e) {
-      toast('Not connected yet');
-    } finally {
-      btnEl.disabled = false;
-    }
-  }
-
-  function openQueue() {
-    queueSearchInput.value = '';
-    queueSearchResultsEl.innerHTML = '';
-    loadQueue();
-    queuePanel.classList.add('visible');
-    const currentFormat = store.get('sd_format') || 'vinyl';
-    if (currentFormat === 'cassette') cassetteBody.classList.add('flip-open');
-    store.set('sd_hint_seen', '1');
-    swipeHint.classList.add('hidden');
-  }
-  function closeQueue() {
-    queuePanel.classList.remove('visible');
-    cassetteBody.classList.remove('flip-open');
-  }
-
-  el('queueBtn').addEventListener('click', openQueue);
-  el('closeQueue').addEventListener('click', closeQueue);
-  cassetteBody.addEventListener('click', openQueue);
-
-  // ---------- settings panel ----------
-  function openSettings() {
-    clientIdInput.value = getClientId();
-    redirectUriInput.value = getRedirectUri();
-    settingsPanel.classList.remove('hidden');
-  }
-  function closeSettings() { settingsPanel.classList.add('hidden'); }
-
-  el('gearBtn').addEventListener('click', openSettings);
-  el('openSettingsFromConnect').addEventListener('click', openSettings);
-  el('closeSettings').addEventListener('click', closeSettings);
-  el('saveSettings').addEventListener('click', () => {
-    store.set('sd_client_id', clientIdInput.value.trim());
-    store.set('sd_redirect_uri', redirectUriInput.value.trim());
-    closeSettings();
-    toast('Saved');
-  });
-  el('disconnectBtn').addEventListener('click', () => {
-    closeSettings();
-    disconnect();
-  });
-  el('connectBtn').addEventListener('click', startAuth);
-
-  // ---------- init ----------
-  window.addEventListener('resize', () => updateMarquee());
-  window.addEventListener('orientationchange', () => setTimeout(updateMarquee, 300));
-
-  (async function init() {
-    setFormat(store.get('sd_format') || 'vinyl');
-    resetInfoStrip();
-    if (store.get('sd_hint_seen')) swipeHint.classList.add('hidden');
-    await handleRedirectCallback();
-    if (isConnected()) {
-      hideConnectOverlay();
-      startPolling();
-    } else {
-      showConnectOverlay();
-    }
-  })();
-})();
+  async
