@@ -30,7 +30,7 @@
   const cdWrap = el('cdWrap');
   const cdDisc = el('cdDisc');
   const cdLid = el('cdLid');
-  const equalizerEl = el('equalizer');
+  const vuMetersEl = el('vuMeters');
   const swipeHint = el('swipeHint');
   const reelLeft = el('reelLeft');
   const reelRight = el('reelRight');
@@ -38,7 +38,9 @@
   const reelRightTape = el('reelRightTape');
   const cassetteTitle = el('cassetteTitle');
   const cassetteSub = el('cassetteSub');
-  const playIcon = el('playIcon');
+  const playBtnBig = el('playBtnBig');
+  const pauseBtnBig = el('pauseBtnBig');
+  const stopBtnBig = el('stopBtnBig');
   const toastEl = el('toast');
   const mediaWindow = el('mediaWindow');
   const cassetteBody = el('cassetteBody');
@@ -46,9 +48,8 @@
   const queueSearchInput = el('queueSearchInput');
   const queueSearchResultsEl = el('queueSearchResults');
   const queueListEl = el('queueList');
-
-  const PLAY_PATH = 'M8,5v14l11-7Z';
-  const PAUSE_PATH = 'M7,5H10V19H7ZM14,5H17V19H14Z';
+  const queueTabBtn = el('queueTabBtn');
+  const settingsTabBtn = el('settingsTabBtn');
 
   // ---------- small storage helpers ----------
   const store = {
@@ -258,7 +259,9 @@
     powerLed.classList.toggle('on', playing);
     vinylLid.classList.toggle('open', playing);
     cdLid.classList.toggle('open', playing);
-    equalizerEl.classList.toggle('active', playing);
+    vuMetersEl.classList.toggle('active', playing);
+    playBtnBig.classList.toggle('active', playing);
+    pauseBtnBig.classList.toggle('active', !playing);
   }
 
   function updateMarquee() {
@@ -355,7 +358,6 @@
     updateMarquee();
 
     setSpinning(isPlaying);
-    playIcon.innerHTML = `<path d="${isPlaying ? PAUSE_PATH : PLAY_PATH}"/>`;
     statusLine.textContent = isPlaying ? 'Playing' : 'Paused';
     lastIsPlaying = isPlaying;
 
@@ -378,7 +380,6 @@
     statusLine.textContent = 'Idle — nothing playing right now';
     setSpinning(false);
     lastIsPlaying = false;
-    playIcon.innerHTML = `<path d="${PLAY_PATH}"/>`;
     hideConnectOverlay();
   }
 
@@ -423,11 +424,17 @@
     }
   }
 
-  el('playBtn').addEventListener('click', () => {
-    transportAction(lastIsPlaying ? '/me/player/pause' : '/me/player/play', 'PUT');
+  playBtnBig.addEventListener('click', () => transportAction('/me/player/play', 'PUT'));
+  pauseBtnBig.addEventListener('click', () => transportAction('/me/player/pause', 'PUT'));
+  stopBtnBig.addEventListener('click', async () => {
+    try {
+      await spotifyFetch('/me/player/pause', 'PUT');
+      await spotifyFetch('/me/player/seek?position_ms=0', 'PUT');
+      setTimeout(fetchNowPlaying, 500);
+    } catch (e) {
+      toast('Not connected yet');
+    }
   });
-  el('prevBtn').addEventListener('click', () => transportAction('/me/player/previous', 'POST'));
-  el('nextBtn').addEventListener('click', () => transportAction('/me/player/next', 'POST'));
 
   // ---------- format switching ----------
   const FORMAT_ORDER = ['vinyl', 'cd', 'cassette'];
@@ -557,6 +564,7 @@
     queueSearchResultsEl.innerHTML = '';
     loadQueue();
     queuePanel.classList.add('visible');
+    queueTabBtn.classList.add('active');
     const currentFormat = store.get('sd_format') || 'vinyl';
     if (currentFormat === 'cassette') cassetteBody.classList.add('flip-open');
     store.set('sd_hint_seen', '1');
@@ -564,10 +572,14 @@
   }
   function closeQueue() {
     queuePanel.classList.remove('visible');
+    queueTabBtn.classList.remove('active');
     cassetteBody.classList.remove('flip-open');
   }
 
-  el('queueBtn').addEventListener('click', openQueue);
+  queueTabBtn.addEventListener('click', () => {
+    if (queuePanel.classList.contains('visible')) closeQueue();
+    else openQueue();
+  });
   el('closeQueue').addEventListener('click', closeQueue);
   cassetteBody.addEventListener('click', openQueue);
 
@@ -576,10 +588,17 @@
     clientIdInput.value = getClientId();
     redirectUriInput.value = getRedirectUri();
     settingsPanel.classList.remove('hidden');
+    settingsTabBtn.classList.add('active');
   }
-  function closeSettings() { settingsPanel.classList.add('hidden'); }
+  function closeSettings() {
+    settingsPanel.classList.add('hidden');
+    settingsTabBtn.classList.remove('active');
+  }
 
-  el('gearBtn').addEventListener('click', openSettings);
+  settingsTabBtn.addEventListener('click', () => {
+    if (settingsPanel.classList.contains('hidden')) openSettings();
+    else closeSettings();
+  });
   el('openSettingsFromConnect').addEventListener('click', openSettings);
   el('closeSettings').addEventListener('click', closeSettings);
   el('saveSettings').addEventListener('click', () => {

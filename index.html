@@ -107,14 +107,6 @@
         <button class="link-btn" id="disconnectBtn" style="margin-top:14px;">Disconnect Spotify account</button>
       </div>
 
-      <button class="corner-btn gear-btn" id="gearBtn" title="Setup">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94a7.14,7.14,0,0,0,.06-.94,7.14,7.14,0,0,0-.06-.94l2.03-1.58a.5.5,0,0,0,.12-.64l-1.92-3.32a.5.5,0,0,0-.6-.22l-2.39.96a7.3,7.3,0,0,0-1.63-.94L14.4,2.81A.5.5,0,0,0,13.9,2.4h-3.8a.5.5,0,0,0-.5.41l-.36,2.55a7.3,7.3,0,0,0-1.63.94l-2.39-.96a.5.5,0,0,0-.6.22L2.7,8.88a.5.5,0,0,0,.12.64L4.85,11.1a7.14,7.14,0,0,0-.06.94,7.14,7.14,0,0,0,.06.94L2.82,14.56a.5.5,0,0,0-.12.64l1.92,3.32a.5.5,0,0,0,.6.22l2.39-.96a7.3,7.3,0,0,0,1.63.94l.36,2.55a.5.5,0,0,0,.5.41h3.8a.5.5,0,0,0,.5-.41l.36-2.55a7.3,7.3,0,0,0,1.63-.94l2.39.96a.5.5,0,0,0,.6-.22l1.92-3.32a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
-      </button>
-
-      <button class="corner-btn queue-btn" id="queueBtn" title="Queue">
-        <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="2" rx="1"/><rect x="4" y="11" width="16" height="2" rx="1"/><rect x="4" y="17" width="10" height="2" rx="1"/><circle cx="19" cy="18" r="2.6" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M19,15.6V18" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>
-      </button>
-
       <div class="queue-panel" id="queuePanel">
         <div class="queue-header">
           <h3>Queue</h3>
@@ -137,26 +129,71 @@
     <div class="info-strip">
       <div class="track-title-mask"><span class="track-title" id="trackTitle">Not connected</span></div>
       <div class="track-artist" id="trackArtist">Tap connect to link Spotify</div>
-      <div class="equalizer" id="equalizer">
-        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      <div class="vu-meters" id="vuMeters">
+        <div class="vu-meter">
+          <svg viewBox="0 0 120 68">
+            <path class="vu-scale" d="M10,58 A50,50 0 0,1 110,58" />
+            <line class="vu-tick" x1="14" y1="55" x2="18" y2="47" />
+            <line class="vu-tick" x1="34" y1="24" x2="38" y2="30" />
+            <line class="vu-tick" x1="60" y1="14" x2="60" y2="21" />
+            <line class="vu-tick" x1="86" y1="24" x2="82" y2="30" />
+            <line class="vu-tick" x1="106" y1="55" x2="102" y2="47" />
+            <line class="vu-needle" id="vuNeedleL" x1="60" y1="60" x2="60" y2="20" />
+            <circle class="vu-pivot" cx="60" cy="60" r="3" />
+          </svg>
+          <span class="vu-label">L</span>
+        </div>
+        <div class="vu-meter">
+          <svg viewBox="0 0 120 68">
+            <path class="vu-scale" d="M10,58 A50,50 0 0,1 110,58" />
+            <line class="vu-tick" x1="14" y1="55" x2="18" y2="47" />
+            <line class="vu-tick" x1="34" y1="24" x2="38" y2="30" />
+            <line class="vu-tick" x1="60" y1="14" x2="60" y2="21" />
+            <line class="vu-tick" x1="86" y1="24" x2="82" y2="30" />
+            <line class="vu-tick" x1="106" y1="55" x2="102" y2="47" />
+            <line class="vu-needle" id="vuNeedleR" x1="60" y1="60" x2="60" y2="20" />
+            <circle class="vu-pivot" cx="60" cy="60" r="3" />
+          </svg>
+          <span class="vu-label">R</span>
+        </div>
       </div>
       <div class="progress-row">
         <span id="elapsedTime">0:00</span>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         <span id="durationTime">0:00</span>
       </div>
-      <div class="transport-row">
-        <button class="transport-btn" id="prevBtn">
-          <svg viewBox="0 0 24 24"><path d="M6,6h2v12H6ZM9.5,12,19,6V18Z"/></svg>
-        </button>
-        <button class="transport-btn play" id="playBtn">
-          <svg viewBox="0 0 24 24" id="playIcon"><path d="M8,5v14l11-7Z"/></svg>
-        </button>
-        <button class="transport-btn" id="nextBtn">
-          <svg viewBox="0 0 24 24"><path d="M16,6h2v12H16ZM5,6l9.5,6L5,18Z"/></svg>
-        </button>
+      <div class="big-transport">
+        <div class="big-transport-btn-wrap">
+          <button class="big-transport-btn play" id="playBtnBig">
+            <svg viewBox="0 0 24 24"><path d="M8,5v14l11-7Z"/></svg>
+          </button>
+          <span class="big-transport-label">Play</span>
+        </div>
+        <div class="big-transport-btn-wrap">
+          <button class="big-transport-btn pause" id="pauseBtnBig">
+            <svg viewBox="0 0 24 24"><path d="M7,5H10V19H7ZM14,5H17V19H14Z"/></svg>
+          </button>
+          <span class="big-transport-label">Pause</span>
+        </div>
+        <div class="big-transport-btn-wrap">
+          <button class="big-transport-btn stop" id="stopBtnBig">
+            <svg viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1.5"/></svg>
+          </button>
+          <span class="big-transport-label">Stop</span>
+        </div>
       </div>
       <div class="status-line" id="statusLine">Not connected</div>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn" id="queueTabBtn">
+        <svg viewBox="0 0 24 24"><path d="M6,7 L18,7 L17,20 L7,20 Z"/><path d="M9,7 a3,3 0 0 1 6,0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span>Queue</span>
+      </button>
+      <button class="tab-btn" id="settingsTabBtn">
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94a7.14,7.14,0,0,0,.06-.94,7.14,7.14,0,0,0-.06-.94l2.03-1.58a.5.5,0,0,0,.12-.64l-1.92-3.32a.5.5,0,0,0-.6-.22l-2.39.96a7.3,7.3,0,0,0-1.63-.94L14.4,2.81A.5.5,0,0,0,13.9,2.4h-3.8a.5.5,0,0,0-.5.41l-.36,2.55a7.3,7.3,0,0,0-1.63.94l-2.39-.96a.5.5,0,0,0-.6.22L2.7,8.88a.5.5,0,0,0,.12.64L4.85,11.1a7.14,7.14,0,0,0-.06.94,7.14,7.14,0,0,0,.06.94L2.82,14.56a.5.5,0,0,0-.12.64l1.92,3.32a.5.5,0,0,0,.6.22l2.39-.96a7.3,7.3,0,0,0,1.63.94l.36,2.55a.5.5,0,0,0,.5.41h3.8a.5.5,0,0,0,.5-.41l.36-2.55a7.3,7.3,0,0,0,1.63-.94l2.39.96a.5.5,0,0,0,.6-.22l1.92-3.32a.5.5,0,0,0-.12-.64ZM12,15.5A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+        <span>Settings</span>
+      </button>
     </div>
 
   </div>
