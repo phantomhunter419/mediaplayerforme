@@ -218,6 +218,7 @@
 
   let lastArtUrl = null;
   let lastIsPlaying = false;
+  let lastTrackId = null;
 
   async function fetchNowPlaying() {
     if (!isConnected()) return;
@@ -329,6 +330,18 @@
     const durationMs = item.duration_ms || 1;
     const deviceName = data.device ? data.device.name : null;
 
+    const trackId = item.id || title;
+    if (trackId && trackId !== lastTrackId) {
+      const isFirstLoad = lastTrackId === null;
+      lastTrackId = trackId;
+      if (!isFirstLoad) {
+        cassetteBody.classList.remove('tape-change');
+        void cassetteBody.offsetWidth; // restart the animation even if it's still mid-run
+        cassetteBody.classList.add('tape-change');
+        setTimeout(() => cassetteBody.classList.remove('tape-change'), 950);
+      }
+    }
+
     trackTitleEl.textContent = title;
     trackArtistEl.textContent = artists;
     cassetteTitle.textContent = title;
@@ -380,6 +393,7 @@
     statusLine.textContent = 'Not connected';
     setSpinning(false);
     lastArtUrl = null;
+    lastTrackId = null;
   }
 
   // ---------- polling ----------

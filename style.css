@@ -278,11 +278,11 @@ button { font-family: inherit; }
 }
 .tonearm {
   position: absolute;
-  top: -4%; right: 2%;
-  width: 44%;
-  height: 44%;
-  transform-origin: 92% 8%;
-  transform: rotate(-18deg);
+  top: 1%; right: 4%;
+  width: 40%;
+  height: 40%;
+  transform-origin: 90% 9%;
+  transform: rotate(-20deg);
   transition: transform 0.6s cubic-bezier(.4,1.4,.5,1) 0.25s;
   z-index: 2;
 }
@@ -497,6 +497,16 @@ button { font-family: inherit; }
   transform: rotateY(-52deg) translateX(-4%) scale(0.96);
   opacity: 0.35;
   filter: brightness(0.6);
+}
+.cassette-body.tape-change {
+  animation: tape-swap 0.9s cubic-bezier(.45,0,.2,1);
+}
+@keyframes tape-swap {
+  0%   { transform: rotateY(0deg) scale(1); opacity: 1; filter: brightness(1); }
+  38%  { transform: rotateY(-98deg) scale(0.92); opacity: 0.2; filter: brightness(0.5); }
+  52%  { transform: rotateY(-98deg) scale(0.9); opacity: 0.15; filter: brightness(0.45); }
+  66%  { transform: rotateY(-98deg) scale(0.92); opacity: 0.2; filter: brightness(0.5); }
+  100% { transform: rotateY(0deg) scale(1); opacity: 1; filter: brightness(1); }
 }
 
 /* ---------- Info strip ---------- */
@@ -930,7 +940,7 @@ button { font-family: inherit; }
 .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 @media (prefers-reduced-motion: reduce) {
-  .vinyl-disc-wrap, .cd-disc-wrap, .reel, .power-led, .equalizer .bar, .swipe-hint { animation: none !important; }
+  .vinyl-disc-wrap, .cd-disc-wrap, .reel, .power-led, .equalizer .bar, .swipe-hint, .cassette-body.tape-change { animation: none !important; }
 }
 
 /* ---------- Landscape layout ---------- */
