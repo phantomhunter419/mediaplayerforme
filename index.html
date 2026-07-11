@@ -39,23 +39,29 @@
     <div class="media-window" id="mediaWindow">
 
       <div class="media-format active" data-format="vinyl">
-        <div class="vinyl-disc-wrap" id="vinylWrap">
-          <div class="vinyl-disc">
-            <div class="vinyl-label" id="vinylLabel"></div>
+        <div class="vinyl-case">
+          <div class="vinyl-disc-wrap" id="vinylWrap">
+            <div class="vinyl-disc">
+              <div class="vinyl-label" id="vinylLabel"></div>
+            </div>
+            <div class="tonearm" id="tonearm">
+              <div class="tonearm-pivot"></div>
+              <div class="tonearm-rod"></div>
+              <div class="tonearm-head"></div>
+            </div>
           </div>
-          <div class="tonearm" id="tonearm">
-            <div class="tonearm-pivot"></div>
-            <div class="tonearm-rod"></div>
-            <div class="tonearm-head"></div>
-          </div>
+          <div class="vinyl-lid" id="vinylLid"></div>
         </div>
       </div>
 
       <div class="media-format" data-format="cd">
-        <div class="cd-disc-wrap" id="cdWrap">
-          <div class="cd-disc" id="cdDisc">
-            <div class="cd-hub"></div>
+        <div class="cd-case">
+          <div class="cd-disc-wrap" id="cdWrap">
+            <div class="cd-disc" id="cdDisc">
+              <div class="cd-hub"></div>
+            </div>
           </div>
+          <div class="cd-lid" id="cdLid"></div>
         </div>
       </div>
 
@@ -124,11 +130,16 @@
         </div>
       </div>
 
+      <div class="swipe-hint" id="swipeHint">▲ swipe up for queue</div>
+
     </div>
 
     <div class="info-strip">
       <div class="track-title-mask"><span class="track-title" id="trackTitle">Not connected</span></div>
       <div class="track-artist" id="trackArtist">Tap connect to link Spotify</div>
+      <div class="equalizer" id="equalizer">
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span><span class="bar"></span>
+      </div>
       <div class="progress-row">
         <span id="elapsedTime">0:00</span>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>

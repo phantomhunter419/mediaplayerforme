@@ -3,8 +3,8 @@
   "short_name": "Spindle",
   "description": "A hi-fi style now-playing display for Spotify",
   "start_url": "./index.html",
-  "display": "standalone",
-  "orientation": "portrait",
+  "display": "fullscreen",
+  "orientation": "any",
   "background_color": "#1c1a16",
   "theme_color": "#1c1a16",
   "icons": [

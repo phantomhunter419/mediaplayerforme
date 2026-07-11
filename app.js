@@ -26,8 +26,12 @@
   const tonearm = el('tonearm');
   const vinylWrap = el('vinylWrap');
   const vinylLabel = el('vinylLabel');
+  const vinylLid = el('vinylLid');
   const cdWrap = el('cdWrap');
   const cdDisc = el('cdDisc');
+  const cdLid = el('cdLid');
+  const equalizerEl = el('equalizer');
+  const swipeHint = el('swipeHint');
   const reelLeft = el('reelLeft');
   const reelRight = el('reelRight');
   const reelLeftTape = el('reelLeftTape');
@@ -251,6 +255,9 @@
     reelRight.classList.toggle('spinning', playing);
     tonearm.classList.toggle('playing', playing);
     powerLed.classList.toggle('on', playing);
+    vinylLid.classList.toggle('open', playing);
+    cdLid.classList.toggle('open', playing);
+    equalizerEl.classList.toggle('active', playing);
   }
 
   function updateMarquee() {
@@ -343,6 +350,8 @@
       lastArtUrl = artUrl;
       vinylLabel.style.backgroundImage = `url("${artUrl}")`;
       cdDisc.style.backgroundImage = `url("${artUrl}")`;
+      vinylLid.style.backgroundImage = `url("${artUrl}")`;
+      cdLid.style.backgroundImage = `url("${artUrl}")`;
       setAmbient(artUrl);
       extractAccentColor(artUrl).then((rgb) => {
         if (rgb) document.documentElement.style.setProperty('--art-accent', rgb);
@@ -418,11 +427,22 @@
   });
 
   let touchStartX = null;
-  mediaWindow.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
+  let touchStartY = null;
+  mediaWindow.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
   mediaWindow.addEventListener('touchend', (e) => {
-    if (touchStartX === null) return;
+    if (touchStartX === null || touchStartY === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
     touchStartX = null;
+    touchStartY = null;
+
+    if (Math.abs(dy) > Math.abs(dx)) {
+      if (dy < -50) openQueue();
+      return;
+    }
     if (Math.abs(dx) < 40) return;
     const current = store.get('sd_format') || 'vinyl';
     let idx = FORMAT_ORDER.indexOf(current);
@@ -525,6 +545,8 @@
     queuePanel.classList.add('visible');
     const currentFormat = store.get('sd_format') || 'vinyl';
     if (currentFormat === 'cassette') cassetteBody.classList.add('flip-open');
+    store.set('sd_hint_seen', '1');
+    swipeHint.classList.add('hidden');
   }
   function closeQueue() {
     queuePanel.classList.remove('visible');
@@ -559,9 +581,13 @@
   el('connectBtn').addEventListener('click', startAuth);
 
   // ---------- init ----------
+  window.addEventListener('resize', () => updateMarquee());
+  window.addEventListener('orientationchange', () => setTimeout(updateMarquee, 300));
+
   (async function init() {
     setFormat(store.get('sd_format') || 'vinyl');
     resetInfoStrip();
+    if (store.get('sd_hint_seen')) swipeHint.classList.add('hidden');
     await handleRedirectCallback();
     if (isConnected()) {
       hideConnectOverlay();
