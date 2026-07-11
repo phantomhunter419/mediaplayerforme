@@ -129,40 +129,18 @@
     <div class="info-strip">
       <div class="track-title-mask"><span class="track-title" id="trackTitle">Not connected</span></div>
       <div class="track-artist" id="trackArtist">Tap connect to link Spotify</div>
-      <div class="vu-meters" id="vuMeters">
-        <div class="vu-meter">
-          <svg viewBox="0 0 120 68">
-            <path class="vu-scale" d="M10,58 A50,50 0 0,1 110,58" />
-            <line class="vu-tick" x1="14" y1="55" x2="18" y2="47" />
-            <line class="vu-tick" x1="34" y1="24" x2="38" y2="30" />
-            <line class="vu-tick" x1="60" y1="14" x2="60" y2="21" />
-            <line class="vu-tick" x1="86" y1="24" x2="82" y2="30" />
-            <line class="vu-tick" x1="106" y1="55" x2="102" y2="47" />
-            <line class="vu-needle" id="vuNeedleL" x1="60" y1="60" x2="60" y2="20" />
-            <circle class="vu-pivot" cx="60" cy="60" r="3" />
-          </svg>
-          <span class="vu-label">L</span>
-        </div>
-        <div class="vu-meter">
-          <svg viewBox="0 0 120 68">
-            <path class="vu-scale" d="M10,58 A50,50 0 0,1 110,58" />
-            <line class="vu-tick" x1="14" y1="55" x2="18" y2="47" />
-            <line class="vu-tick" x1="34" y1="24" x2="38" y2="30" />
-            <line class="vu-tick" x1="60" y1="14" x2="60" y2="21" />
-            <line class="vu-tick" x1="86" y1="24" x2="82" y2="30" />
-            <line class="vu-tick" x1="106" y1="55" x2="102" y2="47" />
-            <line class="vu-needle" id="vuNeedleR" x1="60" y1="60" x2="60" y2="20" />
-            <circle class="vu-pivot" cx="60" cy="60" r="3" />
-          </svg>
-          <span class="vu-label">R</span>
-        </div>
-      </div>
       <div class="progress-row">
         <span id="elapsedTime">0:00</span>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
         <span id="durationTime">0:00</span>
       </div>
       <div class="big-transport">
+        <div class="big-transport-btn-wrap">
+          <button class="big-transport-btn next" id="nextBtnBig">
+            <svg viewBox="0 0 24 24"><path d="M16,6h2v12H16ZM5,6l9.5,6L5,18Z"/></svg>
+          </button>
+          <span class="big-transport-label">Next</span>
+        </div>
         <div class="big-transport-btn-wrap">
           <button class="big-transport-btn play" id="playBtnBig">
             <svg viewBox="0 0 24 24"><path d="M8,5v14l11-7Z"/></svg>

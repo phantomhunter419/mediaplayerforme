@@ -30,7 +30,6 @@
   const cdWrap = el('cdWrap');
   const cdDisc = el('cdDisc');
   const cdLid = el('cdLid');
-  const vuMetersEl = el('vuMeters');
   const swipeHint = el('swipeHint');
   const reelLeft = el('reelLeft');
   const reelRight = el('reelRight');
@@ -38,6 +37,7 @@
   const reelRightTape = el('reelRightTape');
   const cassetteTitle = el('cassetteTitle');
   const cassetteSub = el('cassetteSub');
+  const nextBtnBig = el('nextBtnBig');
   const playBtnBig = el('playBtnBig');
   const pauseBtnBig = el('pauseBtnBig');
   const stopBtnBig = el('stopBtnBig');
@@ -259,7 +259,6 @@
     powerLed.classList.toggle('on', playing);
     vinylLid.classList.toggle('open', playing);
     cdLid.classList.toggle('open', playing);
-    vuMetersEl.classList.toggle('active', playing);
     playBtnBig.classList.toggle('active', playing);
     pauseBtnBig.classList.toggle('active', !playing);
   }
@@ -424,6 +423,7 @@
     }
   }
 
+  nextBtnBig.addEventListener('click', () => transportAction('/me/player/next', 'POST'));
   playBtnBig.addEventListener('click', () => transportAction('/me/player/play', 'PUT'));
   pauseBtnBig.addEventListener('click', () => transportAction('/me/player/pause', 'PUT'));
   stopBtnBig.addEventListener('click', async () => {
