@@ -19,6 +19,7 @@
   const trackTitleEl = el('trackTitle');
   const trackArtistEl = el('trackArtist');
   const statusLine = el('statusLine');
+  const nowPlayingStatus = el('nowPlayingStatus');
   const elapsedTimeEl = el('elapsedTime');
   const durationTimeEl = el('durationTime');
   const progressFill = el('progressFill');
@@ -44,6 +45,8 @@
   const toastEl = el('toast');
   const mediaWindow = el('mediaWindow');
   const cassetteBody = el('cassetteBody');
+  const tonearmHead = el('tonearmHead');
+  const cdHub = el('cdHub');
   const queuePanel = el('queuePanel');
   const queueSearchInput = el('queueSearchInput');
   const queueSearchResultsEl = el('queueSearchResults');
@@ -358,6 +361,7 @@
 
     setSpinning(isPlaying);
     statusLine.textContent = isPlaying ? 'Playing' : 'Paused';
+    nowPlayingStatus.textContent = isPlaying ? 'Playing' : 'Paused';
     lastIsPlaying = isPlaying;
 
     if (artUrl && artUrl !== lastArtUrl) {
@@ -377,6 +381,7 @@
 
   function showIdle() {
     statusLine.textContent = 'Idle — nothing playing right now';
+    nowPlayingStatus.textContent = 'Idle';
     setSpinning(false);
     lastIsPlaying = false;
     hideConnectOverlay();
@@ -391,6 +396,7 @@
     durationTimeEl.textContent = '0:00';
     progressFill.style.width = '0%';
     statusLine.textContent = 'Not connected';
+    nowPlayingStatus.textContent = 'Not connected';
     setSpinning(false);
     lastArtUrl = null;
     lastTrackId = null;
@@ -461,7 +467,7 @@
     touchStartY = null;
 
     if (Math.abs(dy) > Math.abs(dx)) {
-      if (dy < -50) openQueue();
+      if (dy < -50) openQueue(e);
       return;
     }
     if (Math.abs(dx) < 40) return;
@@ -559,10 +565,30 @@
     }
   }
 
-  function openQueue() {
+  function setQueueOrigin(originEvent) {
+    const rect = mediaWindow.getBoundingClientRect();
+    let x = rect.left + rect.width / 2;
+    let y = rect.top + rect.height * 0.65;
+    if (originEvent) {
+      if (originEvent.changedTouches && originEvent.changedTouches[0]) {
+        x = originEvent.changedTouches[0].clientX;
+        y = originEvent.changedTouches[0].clientY;
+      } else if (typeof originEvent.clientX === 'number' && (originEvent.clientX || originEvent.clientY)) {
+        x = originEvent.clientX;
+        y = originEvent.clientY;
+      }
+    }
+    const originX = Math.min(100, Math.max(0, ((x - rect.left) / rect.width) * 100)).toFixed(1);
+    const originY = Math.min(100, Math.max(0, ((y - rect.top) / rect.height) * 100)).toFixed(1);
+    queuePanel.style.setProperty('--queue-origin-x', originX + '%');
+    queuePanel.style.setProperty('--queue-origin-y', originY + '%');
+  }
+
+  function openQueue(originEvent) {
     queueSearchInput.value = '';
     queueSearchResultsEl.innerHTML = '';
     loadQueue();
+    setQueueOrigin(originEvent);
     queuePanel.classList.add('visible');
     queueTabBtn.classList.add('active');
     const currentFormat = store.get('sd_format') || 'vinyl';
@@ -576,12 +602,30 @@
     cassetteBody.classList.remove('flip-open');
   }
 
-  queueTabBtn.addEventListener('click', () => {
+  queueTabBtn.addEventListener('click', (e) => {
     if (queuePanel.classList.contains('visible')) closeQueue();
-    else openQueue();
+    else openQueue(e);
   });
   el('closeQueue').addEventListener('click', closeQueue);
-  cassetteBody.addEventListener('click', openQueue);
+  cassetteBody.addEventListener('click', (e) => openQueue(e));
+
+  function pulseAndOpenQueue(targetEl, e) {
+    targetEl.classList.remove('queue-tap');
+    void targetEl.offsetWidth;
+    targetEl.classList.add('queue-tap');
+    setTimeout(() => targetEl.classList.remove('queue-tap'), 460);
+    openQueue(e);
+  }
+  tonearmHead.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!tonearm.classList.contains('playing')) return;
+    pulseAndOpenQueue(tonearmHead, e);
+  });
+  cdHub.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!cdWrap.classList.contains('spinning')) return;
+    pulseAndOpenQueue(cdHub, e);
+  });
 
   // ---------- settings panel ----------
   function openSettings() {

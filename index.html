@@ -47,8 +47,9 @@
           </div>
           <div class="tonearm" id="tonearm">
             <div class="tonearm-pivot"></div>
-            <div class="tonearm-rod"></div>
-            <div class="tonearm-head"></div>
+            <div class="tonearm-rod">
+              <div class="tonearm-head" id="tonearmHead"></div>
+            </div>
           </div>
           <div class="vinyl-lid" id="vinylLid"></div>
         </div>
@@ -58,7 +59,7 @@
         <div class="cd-case">
           <div class="cd-disc-wrap" id="cdWrap">
             <div class="cd-disc" id="cdDisc">
-              <div class="cd-hub"></div>
+              <div class="cd-hub" id="cdHub"></div>
             </div>
           </div>
           <div class="cd-lid" id="cdLid"></div>
@@ -129,6 +130,7 @@
     <div class="info-strip">
       <div class="track-title-mask"><span class="track-title" id="trackTitle">Not connected</span></div>
       <div class="track-artist" id="trackArtist">Tap connect to link Spotify</div>
+      <div class="now-playing-status" id="nowPlayingStatus">Not connected</div>
       <div class="progress-row">
         <span id="elapsedTime">0:00</span>
         <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
